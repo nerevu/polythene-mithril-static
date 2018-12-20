@@ -6,7 +6,6 @@ import assets from 'metalsmith-assets'
 import fingerprint from 'metalsmith-fingerprint-ignore'
 
 import paths from '../config/paths'
-import { StatisticsPlugin } from './metalsmith-helpers'
 
 const __PROD__ = process.env.NODE_ENV === 'production'
 
@@ -26,7 +25,7 @@ export default new Metalsmith(paths.projectRoot)
   }))
   .use(layouts({
     engine: 'handlebars',
-    default: 'default.html',
+    default: 'default.hbs',
     // to avoid conflics, we match only html files
     pattern: '**/*.html',
     helpers: {
@@ -35,7 +34,3 @@ export default new Metalsmith(paths.projectRoot)
       debug: (obj) => JSON.stringify(obj, null, 2)
     }
   }))
-  // Display statistics of generated files at the end
-  .use(StatisticsPlugin())
-  // Import above and use the debug plugin to get more detailed information
-  // .use(DebugPlugin())

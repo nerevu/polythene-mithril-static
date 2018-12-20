@@ -1,14 +1,15 @@
 const { join } = require('path')
 const Webpack = require('webpack')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 
 const paths = require('./src/config/paths')
 
-const __DEV__ = process.env.NODE_ENV !== 'production'
-const __PROD__ = process.env.NODE_ENV === 'production'
+const mode = process.env.NODE_ENV
+const __DEV__ = mode !== 'production'
 
 const config = {
+  mode: mode,
   entry: {
     immediate: join(paths.webpackSource, 'js', 'immediate.js'),
     page: join(paths.webpackSource, 'js', 'page.js')
@@ -27,16 +28,23 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          use: ['css-loader', 'postcss-loader']
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              modules: true,
+              sourceMap: __DEV__,
+              localIdentName: "[local]"
+            }
+          },
+        ]
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin({
+    new MiniCssExtractPlugin({
       filename: 'page.css',
-      allChunks: true
     })
   ]
 }
@@ -49,9 +57,7 @@ if (__DEV__) {
   config.plugins.push(new WriteFilePlugin({
     log: false
   }))
-}
-
-if (__PROD__) {
+} else {
   config.plugins.push(new Webpack.LoaderOptionsPlugin({
     minimize: true
   }))
