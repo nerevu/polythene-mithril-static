@@ -20,7 +20,7 @@ module.exports = {
             })
           ]),
           m("body", [
-            m("#container", attrs.content),
+            m("#container.content", attrs.content),
             m("script[async]", {
               src: attrs.fingerprint[`${attrs.js}/app.js`]
             })

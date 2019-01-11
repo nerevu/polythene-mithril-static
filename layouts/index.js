@@ -25,7 +25,7 @@ module.exports = {
           })
         )
       ]),
-      m(".content", m.trust(file.html))
+      m.trust(file.html)
     ];
     return this;
   },
