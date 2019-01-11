@@ -1,5 +1,7 @@
 # Project related
-dist
+dist/
+public/
+tmp/
 
 # Let's avoid lock files since this is just a boilerplate
 # You might consider having them in your final project

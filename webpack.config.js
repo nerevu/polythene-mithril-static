@@ -1,30 +1,50 @@
-const { join } = require('path')
-const Webpack = require('webpack')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const WriteFilePlugin = require('write-file-webpack-plugin')
+const { resolve, join } = require("path");
+const Webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WriteFilePlugin = require("write-file-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
-const paths = require('./src/config/paths')
+const paths = require("./paths");
 
-const mode = process.env.NODE_ENV
-const __DEV__ = mode !== 'production'
+const resolvedPath = fileOrDir => resolve(__dirname, fileOrDir);
+const mode = process.env.NODE_ENV;
+const devMode = mode === "development";
+
+console.log({ devMode });
 
 const config = {
-  mode: mode,
+  mode,
+
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {}
+        }
+      })
+    ]
+  },
+
+  context: resolvedPath(paths.source),
+
   entry: {
-    immediate: join(paths.webpackSource, 'js', 'immediate.js'),
-    page: join(paths.webpackSource, 'js', 'page.js')
+    index: `./${paths.js}/init.js`
   },
-  devtool: __DEV__ ? '#cheap-module-eval-source-map' : false,
+
   output: {
-    path: paths.webpackDestination,
-    publicPath: paths.webpackPublicPath,
-    filename: '[name].js'
+    path: resolvedPath(paths.dest),
+    filename: `${paths.js}/app.js`
   },
+
+  resolve: {
+    extensions: ["*", ".mjs", ".js"]
+  },
+
   module: {
     rules: [
       {
         test: /\.js$/,
-        use: 'babel-loader'
+        use: "babel-loader"
       },
       {
         test: /\.css$/,
@@ -34,40 +54,40 @@ const config = {
             loader: "css-loader",
             options: {
               modules: true,
-              sourceMap: __DEV__,
+              sourceMap: devMode,
               localIdentName: "[local]"
             }
-          },
+          }
         ]
       }
     ]
   },
+
+  devServer: {
+    contentBase: "public",
+    historyApiFallback: true
+  },
+
+  watchOptions: {
+    ignored: /node_modules/
+  },
+
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'page.css',
+      filename: "stylesheets/app.css"
     })
-  ]
-}
+  ],
 
-if (__DEV__) {
-  config.plugins.push(new Webpack.LoaderOptionsPlugin({
-    debug: true
-  }))
+  devtool: devMode ? "#cheap-module-eval-source-map" : false
+};
+
+if (devMode) {
   // Force webpack-dev-middleware to write files to the disk for metalsmith
-  config.plugins.push(new WriteFilePlugin({
-    log: false
-  }))
-} else {
-  config.plugins.push(new Webpack.LoaderOptionsPlugin({
-    minimize: true
-  }))
-  config.plugins.push(new Webpack.DefinePlugin({
-    'process.env': {
-      'NODE_ENV': JSON.stringify('production')
-    }
-  }))
-  config.plugins.push(new Webpack.optimize.AggressiveMergingPlugin())
-  config.plugins.push(new Webpack.optimize.UglifyJsPlugin())
+  config.plugins.push(
+    new WriteFilePlugin({
+      log: false
+    })
+  );
 }
 
-module.exports = config
+module.exports = config;
