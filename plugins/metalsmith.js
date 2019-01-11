@@ -11,12 +11,11 @@ export default new Metalsmith(paths.projectRoot)
   .clean(__PROD__)
   .source(paths.source)
   .destination(paths.dest)
+  .metadata(paths)
   .use(fingerprint({ pattern: ["**/*.css", "**/*.js"] }))
   .use(markdown())
   .use(
     mithril.layouts({
-      // pattern: "**/*.html",
-      ext: ".js",
-      default: "index.js"
+      ext: ".js"
     })
   );

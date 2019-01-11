@@ -38,7 +38,7 @@ markdown = function(file) {
   return /\.md|\.markdown/.test(extname(file));
 };
 
-module.exports = function(options) {
+export default function(options) {
   var keys, opts;
   options = options || {};
   opts = defaults(options, DEFAULTS);

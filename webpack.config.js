@@ -28,7 +28,7 @@ const config = {
   context: resolvedPath(paths.source),
 
   entry: {
-    index: `./${paths.js}/init.js`
+    index: `./${paths.js}/main.js`
   },
 
   output: {
